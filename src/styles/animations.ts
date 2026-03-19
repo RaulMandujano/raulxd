@@ -53,7 +53,10 @@ export const fadeUp: Variants = {
 export const hoverLiftProps = {
   whileHover: {
     scale: 1.02,
-    y: -4,
+    y: -5,
   },
-  transition: fastTransition,
+  transition: {
+    duration: 0.3,
+    ease: smoothEase,
+  },
 } as const;

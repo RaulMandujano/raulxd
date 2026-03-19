@@ -14,4 +14,4 @@ export const glassPanelClassName =
   "border border-white/10 bg-white/[0.38] shadow-[0_22px_60px_-34px_rgba(15,23,42,0.28),inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-md";
 
 export const glassHoverClassName =
-  "transition-shadow hover:shadow-[0_30px_90px_-34px_rgba(76,29,149,0.18),0_24px_70px_-30px_rgba(14,165,233,0.2)]";
+  "transition-[box-shadow,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:shadow-[0_34px_96px_-30px_rgba(76,29,149,0.22),0_26px_78px_-26px_rgba(14,165,233,0.24),0_0_0_1px_rgba(255,255,255,0.08)]";
