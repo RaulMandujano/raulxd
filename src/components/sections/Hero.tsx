@@ -213,13 +213,13 @@ export function Hero() {
 
                   <m.div variants={fadeUp} className="mt-10 flex flex-wrap items-center gap-4">
                     <MagneticButtonLink
-                      href="#contact"
-                      variant="dark"
-                      className={cn(
-                        "hover:-translate-y-0.5 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-950/20",
-                        "hover:shadow-[0_20px_60px_-16px_rgba(59,130,246,0.34),0_18px_50px_-20px_rgba(168,85,247,0.28)]",
-                      )}
-                    >
+                    href="#contact"
+                    variant="dark"
+                    className={cn(
+                      "!text-white hover:-translate-y-0.5 hover:!text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-950/20",
+                      "hover:shadow-[0_20px_60px_-16px_rgba(59,130,246,0.34),0_18px_50px_-20px_rgba(168,85,247,0.28)]",
+                    )}
+                  >
                       Let&apos;s Connect
                       <ArrowUpRight className="h-4 w-4" />
                     </MagneticButtonLink>
