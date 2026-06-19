@@ -16,8 +16,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Portfolio",
-  description: "Personal portfolio website",
+  title: "Raul Mandujano — Full-Stack & AI/SaaS Engineer",
+  description:
+    "Full-stack engineer and SaaS builder. I design and ship scalable AI-powered products — CRM systems, automation engines, and multi-tenant platforms. Selected work: Evano Studio, CrewX, EvanoTask, Evano Development, El Inka Envíos.",
 };
 
 export default function RootLayout({

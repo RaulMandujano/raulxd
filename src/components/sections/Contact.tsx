@@ -84,10 +84,10 @@ export function Contact() {
 
             <div className="flex flex-col items-center justify-center gap-4 pt-5 sm:flex-row">
               <MagneticButtonLink
-                href="https://wa.me/18016027150?text=Hi%20Evano%20Development%2C%20I%27d%20like%20to%20connect."
+                href="https://wa.me/14072252926?text=Hi%20Evano%20Development%2C%20I%27d%20like%20to%20connect."
                 target="_blank"
                 rel="noreferrer"
-                aria-label="Send a WhatsApp message to +1 801 602 7150"
+                aria-label="Send a WhatsApp message to +1 407 225 2926"
                 variant="dark"
                 className={cn(
                   "bg-[#25D366] !text-white hover:-translate-y-0.5 hover:bg-[#20bd5a] hover:!text-white focus:outline-none focus:ring-2 focus:ring-[#25D366]/40",
@@ -100,11 +100,11 @@ export function Contact() {
               </MagneticButtonLink>
 
               <a
-                href="mailto:customer@evanodevelopment.com"
+                href="mailto:paul@evano.dev"
                 className="interactive-link inline-flex items-center gap-2 text-sm font-medium !text-white hover:!text-white focus-visible:!text-white"
               >
                 <Mail className="h-4 w-4" />
-                customer@evanodevelopment.com
+                paul@evano.dev
               </a>
             </div>
           </div>
