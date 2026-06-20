@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Raul Mandujano — Resume</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #0f172a;
+        --ink-soft: #3f4a5c;
+        --muted: #6b7687;
+        --line: #e6eaf1;
+        --brand: #2563eb;
+        --brand-2: #7c3aed;
+        --accent: #0ea5e9;
+        --tint: #f6f8fc;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      @page {
+        size: Letter;
+        margin: 0;
+      }
+
+      html,
+      body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+        color: var(--ink);
+        background: #ffffff;
+      }
+
+      .page {
+        width: 8.5in;
+        min-height: 11in;
+        margin: 0 auto;
+        padding: 0.5in 0.55in 0.45in;
+        position: relative;
+      }
+      .page::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, var(--brand), var(--brand-2) 55%, var(--accent));
+      }
+
+      /* ---------------- Header ---------------- */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 24px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      .name {
+        font-size: 34px;
+        font-weight: 900;
+        letter-spacing: -0.035em;
+        line-height: 1;
+        color: var(--ink);
+      }
+      .role {
+        margin-top: 7px;
+        font-size: 12.5px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        background: linear-gradient(95deg, var(--brand), var(--brand-2) 60%, var(--accent));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .contact {
+        flex-shrink: 0;
+        display: grid;
+        gap: 5px;
+        padding-top: 3px;
+      }
+      .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 9.7px;
+        font-weight: 500;
+        color: var(--ink-soft);
+        justify-content: flex-end;
+      }
+      .contact-item a {
+        color: var(--ink-soft);
+        text-decoration: none;
+      }
+      .contact-item svg {
+        width: 12px;
+        height: 12px;
+        flex-shrink: 0;
+        stroke: var(--brand);
+        order: 2;
+      }
+      .contact-item span,
+      .contact-item a {
+        order: 1;
+      }
+
+      /* ---------------- Summary ---------------- */
+      .summary {
+        margin: 14px 0 4px;
+        font-size: 10.6px;
+        line-height: 1.6;
+        color: var(--ink-soft);
+      }
+      .summary strong {
+        color: var(--ink);
+        font-weight: 700;
+      }
+
+      /* ---------------- Layout ---------------- */
+      .grid {
+        display: grid;
+        grid-template-columns: 1.42fr 1fr;
+        gap: 26px;
+        margin-top: 14px;
+      }
+
+      .sec-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--ink);
+        margin-bottom: 11px;
+      }
+      .sec-title::before {
+        content: "";
+        width: 13px;
+        height: 13px;
+        border-radius: 4px;
+        background: linear-gradient(135deg, var(--brand), var(--brand-2));
+        flex-shrink: 0;
+      }
+      .block + .block {
+        margin-top: 18px;
+      }
+
+      /* ---------------- Experience (timeline) ---------------- */
+      .timeline {
+        position: relative;
+        padding-left: 17px;
+      }
+      .timeline::before {
+        content: "";
+        position: absolute;
+        left: 3px;
+        top: 4px;
+        bottom: 4px;
+        width: 2px;
+        background: linear-gradient(180deg, var(--brand), var(--brand-2) 60%, rgba(124, 58, 237, 0.15));
+        border-radius: 2px;
+      }
+      .job {
+        position: relative;
+        margin-bottom: 15px;
+      }
+      .job:last-child {
+        margin-bottom: 0;
+      }
+      .job::before {
+        content: "";
+        position: absolute;
+        left: -17px;
+        top: 3px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--brand);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      }
+      .job-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 10px;
+      }
+      .job-role {
+        font-size: 12.5px;
+        font-weight: 800;
+        color: var(--ink);
+        line-height: 1.2;
+      }
+      .job-when {
+        font-size: 9.3px;
+        font-weight: 700;
+        color: var(--brand);
+        white-space: nowrap;
+        background: rgba(37, 99, 235, 0.08);
+        padding: 2px 7px;
+        border-radius: 999px;
+      }
+      .job-org {
+        font-size: 10.5px;
+        font-weight: 600;
+        color: var(--brand-2);
+        margin-top: 2px;
+      }
+      .job-org .sep {
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .job-context {
+        font-size: 9.2px;
+        font-style: italic;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+      .bullets {
+        margin: 7px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+      .bullets li {
+        position: relative;
+        font-size: 10px;
+        line-height: 1.48;
+        color: var(--ink-soft);
+        padding-left: 14px;
+        margin-bottom: 4px;
+      }
+      .bullets li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 5px;
+        width: 5px;
+        height: 5px;
+        border-radius: 1.5px;
+        background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      }
+
+      /* ---------------- Sidebar pieces ---------------- */
+      .skill-group {
+        margin-bottom: 9px;
+      }
+      .skill-label {
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        margin-bottom: 5px;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      .chip {
+        font-size: 9px;
+        font-weight: 600;
+        color: #1e293b;
+        background: var(--tint);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 3px 7px;
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 11px 12px;
+        background: linear-gradient(180deg, #ffffff, var(--tint));
+        position: relative;
+        overflow: hidden;
+      }
+      .card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(180deg, var(--brand), var(--brand-2));
+      }
+      .edu-school {
+        font-size: 11.5px;
+        font-weight: 800;
+        color: var(--ink);
+      }
+      .edu-degree {
+        font-size: 9.8px;
+        color: var(--ink-soft);
+        margin-top: 2px;
+        line-height: 1.4;
+      }
+      .edu-meta {
+        font-size: 9px;
+        color: var(--brand);
+        font-weight: 700;
+        margin-top: 4px;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+      .stat {
+        text-align: center;
+        background: var(--tint);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        padding: 7px 4px;
+      }
+      .stat-num {
+        font-size: 15px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        background: linear-gradient(120deg, var(--brand), var(--brand-2));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .stat-lbl {
+        font-size: 7px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        margin-top: 1px;
+        line-height: 1.2;
+      }
+
+      /* ---------------- Projects ---------------- */
+      .projects-section {
+        margin-top: 16px;
+      }
+      .projects {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+      }
+      .project {
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 9px 11px 10px;
+        position: relative;
+        overflow: hidden;
+        background: #ffffff;
+      }
+      .project::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: var(--bar, linear-gradient(90deg, var(--brand), var(--brand-2)));
+      }
+      .p-top {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 6px;
+        margin-top: 2px;
+      }
+      .p-name {
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--ink);
+      }
+      .p-domain {
+        font-size: 7.6px;
+        font-weight: 700;
+        color: var(--muted);
+      }
+      .p-desc {
+        font-size: 9.1px;
+        line-height: 1.42;
+        color: var(--ink-soft);
+        margin: 4px 0 6px;
+      }
+      .p-tech {
+        font-size: 7.8px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        color: var(--brand);
+      }
+      .more {
+        margin-top: 9px;
+        font-size: 8.8px;
+        color: var(--muted);
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <!-- ============ HEADER ============ -->
+      <header class="header">
+        <div>
+          <div class="name">Raul Mandujano</div>
+          <div class="role">Full-Stack Developer · SaaS, AI &amp; ERP Systems</div>
+        </div>
+        <div class="contact">
+          <div class="contact-item">
+            <a href="mailto:raulmandujano08@gmail.com">raulmandujano08@gmail.com</a>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+          </div>
+          <div class="contact-item">
+            <a href="tel:+14072252926">+1 (407) 225-2926</a>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
+          </div>
+          <div class="contact-item">
+            <span>Utah, United States</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="contact-item">
+            <a href="https://github.com/RaulMandujano">github.com/RaulMandujano</a>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          </div>
+          <div class="contact-item">
+            <a href="https://evano.dev">evano.dev</a>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z"/></svg>
+          </div>
+        </div>
+      </header>
+
+      <!-- ============ SUMMARY ============ -->
+      <p class="summary">
+        Full-stack developer who ships production software end to end — from
+        architecture and UI to deployment. I build <strong>scalable SaaS
+        platforms</strong>, <strong>AI-powered automation</strong>, and have
+        hands-on experience keeping enterprise <strong>CRM / ERP systems</strong>
+        running and integrated with e-commerce. I turn business problems into
+        reliable, well-engineered products.
+      </p>
+
+      <!-- ============ TWO-COLUMN BODY ============ -->
+      <div class="grid">
+        <!-- MAIN: Experience -->
+        <div class="col-main">
+          <div class="sec-title">Experience</div>
+          <div class="timeline">
+            <div class="job">
+              <div class="job-head">
+                <div class="job-role">Co-Founder &amp; Full-Stack Developer</div>
+                <div class="job-when">2021 — Present</div>
+              </div>
+              <div class="job-org">Evano Development <span class="sep">· Utah (Remote)</span></div>
+              <ul class="bullets">
+                <li>Design and ship multiple live SaaS platforms end to end — architecture, front-end, APIs, and deployment.</li>
+                <li>Build AI-driven automation and CRM tools integrating OpenAI GPT, local LLMs, and the Meta / WhatsApp APIs.</li>
+                <li>Deliver multi-tenant products with real-time data, OAuth 2.0, and serverless infrastructure on Firebase.</li>
+              </ul>
+            </div>
+
+            <div class="job">
+              <div class="job-head">
+                <div class="job-role">Dynamics 365 Expert</div>
+                <div class="job-when">2023 — 2025</div>
+              </div>
+              <div class="job-org">Mrs. Fields <span class="sep">· Utah</span></div>
+              <div class="job-context">Microsoft Dynamics 365 — enterprise CRM &amp; ERP platform.</div>
+              <ul class="bullets">
+                <li>Owned day-to-day reliability of the Dynamics 365 CRM/ERP, keeping core business operations running without disruption.</li>
+                <li>Designed and built new automated workflows inside the ERP to streamline orders, inventory, and customer data.</li>
+                <li>Integrated Dynamics 365 with <strong>Shopify Plus</strong>, syncing e-commerce orders, products, and customers so the full system operated as one.</li>
+                <li>Troubleshot and resolved data and process issues across the ERP to keep teams unblocked and the platform healthy.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- SIDE: Skills, Education, GitHub -->
+        <div class="col-side">
+          <div class="block">
+            <div class="sec-title">Technical Skills</div>
+            <div class="skill-group">
+              <div class="skill-label">Languages</div>
+              <div class="chips">
+                <span class="chip">TypeScript</span>
+                <span class="chip">JavaScript</span>
+                <span class="chip">Python</span>
+                <span class="chip">HTML5</span>
+                <span class="chip">CSS3</span>
+                <span class="chip">SQL</span>
+              </div>
+            </div>
+            <div class="skill-group">
+              <div class="skill-label">Frameworks &amp; UI</div>
+              <div class="chips">
+                <span class="chip">React</span>
+                <span class="chip">Next.js</span>
+                <span class="chip">Node.js</span>
+                <span class="chip">Tailwind CSS</span>
+              </div>
+            </div>
+            <div class="skill-group">
+              <div class="skill-label">AI &amp; Integrations</div>
+              <div class="chips">
+                <span class="chip">OpenAI GPT</span>
+                <span class="chip">Local LLMs</span>
+                <span class="chip">Meta / WhatsApp APIs</span>
+                <span class="chip">Shopify Plus</span>
+              </div>
+            </div>
+            <div class="skill-group">
+              <div class="skill-label">Platforms &amp; Data</div>
+              <div class="chips">
+                <span class="chip">Dynamics 365</span>
+                <span class="chip">Firebase</span>
+                <span class="chip">REST APIs</span>
+                <span class="chip">OAuth 2.0</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="block">
+            <div class="sec-title">Education</div>
+            <div class="card">
+              <div class="edu-school">Utah Valley University</div>
+              <div class="edu-degree">B.S. in Web &amp; Design Development</div>
+              <div class="edu-meta">Graduated 2022 · Utah</div>
+            </div>
+          </div>
+
+          <div class="block">
+            <div class="sec-title">GitHub Activity</div>
+            <div class="stats">
+              <div class="stat"><div class="stat-num">488</div><div class="stat-lbl">Contributions / yr</div></div>
+              <div class="stat"><div class="stat-num">70</div><div class="stat-lbl">Repositories</div></div>
+              <div class="stat"><div class="stat-num">119</div><div class="stat-lbl">Active days</div></div>
+              <div class="stat"><div class="stat-num">2016</div><div class="stat-lbl">Coding since</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ PROJECTS ============ -->
+      <div class="projects-section">
+        <div class="sec-title">Selected Projects</div>
+        <div class="projects">
+          <div class="project" style="--bar: linear-gradient(90deg,#0ea5e9,#22d3ee)">
+            <div class="p-top">
+              <span class="p-name">Evano Studio</span>
+              <span class="p-domain">evanostudio.com</span>
+            </div>
+            <div class="p-desc">Open-source desktop app to build and run local AI agents — fully private, no cloud or API keys.</div>
+            <div class="p-tech">Ollama · ChromaDB · SQLite · Desktop</div>
+          </div>
+
+          <div class="project" style="--bar: linear-gradient(90deg,#7c3aed,#a855f7)">
+            <div class="p-top">
+              <span class="p-name">CrewX</span>
+              <span class="p-domain">crewx.space</span>
+            </div>
+            <div class="p-desc">Omnichannel AI CRM unifying Facebook, Instagram &amp; WhatsApp into one inbox with GPT assistants.</div>
+            <div class="p-tech">Next.js · Firebase · OpenAI · Meta APIs</div>
+          </div>
+
+          <div class="project" style="--bar: linear-gradient(90deg,#10b981,#34d399)">
+            <div class="p-top">
+              <span class="p-name">EvanoTask</span>
+              <span class="p-domain">evanotask.com</span>
+            </div>
+            <div class="p-desc">Habits, tasks &amp; personal-finance app on a single calendar — available on web and native iOS.</div>
+            <div class="p-tech">Next.js · React · Native iOS · Real-time</div>
+          </div>
+
+          <div class="project" style="--bar: linear-gradient(90deg,#f59e0b,#f97316)">
+            <div class="p-top">
+              <span class="p-name">El Inka Envíos</span>
+              <span class="p-domain">inkaenvios.com</span>
+            </div>
+            <div class="p-desc">Logistics platform for US → Latin America shipping with calendar-based scheduling and tracking.</div>
+            <div class="p-tech">Next.js · Tailwind · Scheduling</div>
+          </div>
+        </div>
+        <p class="more">+ Evano Development studio site (evano.dev) and 70+ public repositories at github.com/RaulMandujano</p>
+      </div>
+    </div>
+  </body>
+</html>

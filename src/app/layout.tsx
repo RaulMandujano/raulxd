@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
 import { CursorLight } from "@/components/layout/CursorLight";
+import { FloatingResume } from "@/components/layout/FloatingResume";
 import { Navbar } from "@/components/layout/Navbar";
 import { SiteBackground } from "@/components/layout/SiteBackground";
 import { MotionProvider } from "@/components/providers/MotionProvider";
@@ -38,6 +39,7 @@ export default function RootLayout({
                 <Navbar />
                 <main className="flex-1">{children}</main>
               </div>
+              <FloatingResume />
             </div>
           </SmoothScrollProvider>
         </MotionProvider>

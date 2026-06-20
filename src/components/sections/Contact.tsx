@@ -100,11 +100,11 @@ export function Contact() {
               </MagneticButtonLink>
 
               <a
-                href="mailto:paul@evano.dev"
+                href="mailto:raulmandujano08@gmail.com"
                 className="interactive-link inline-flex items-center gap-2 text-sm font-medium !text-white hover:!text-white focus-visible:!text-white"
               >
                 <Mail className="h-4 w-4" />
-                paul@evano.dev
+                raulmandujano08@gmail.com
               </a>
             </div>
           </div>
