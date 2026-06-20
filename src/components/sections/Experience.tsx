@@ -28,6 +28,7 @@ const experiences = [
       "Building SaaS platforms with scalable product foundations and fast iteration cycles.",
       "Designing CRM systems tailored to operational workflows and revenue teams.",
       "Shipping AI-driven automation tools that reduce manual work and increase execution speed.",
+      "Building professional WordPress sites enhanced with custom code for advanced, tailored projects.",
     ],
   },
 ];
