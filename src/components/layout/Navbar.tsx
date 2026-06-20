@@ -94,10 +94,8 @@ export function Navbar() {
                   href={item.href}
                   className={cn(
                     "interactive-link rounded-full px-3 py-2 text-sm font-medium text-slate-600 lg:px-4",
-                    "hover:bg-slate-950 hover:text-white",
-                    isScrolled
-                      ? "hover:shadow-[0_10px_24px_-14px_rgba(15,23,42,0.45)]"
-                      : "hover:bg-white/90 hover:text-slate-950",
+                    "hover:bg-slate-950 hover:!text-white",
+                    "hover:shadow-[0_10px_24px_-14px_rgba(15,23,42,0.45)]",
                   )}
                 >
                   {item.label}
@@ -160,7 +158,7 @@ export function Navbar() {
                   <a
                     href={item.href}
                     onClick={() => setIsMenuOpen(false)}
-                    className="block rounded-2xl px-4 py-3 text-sm font-medium text-slate-700 transition-colors duration-200 hover:bg-slate-950 hover:text-white"
+                    className="block rounded-2xl px-4 py-3 text-sm font-medium text-slate-700 transition-colors duration-200 hover:bg-slate-950 hover:!text-white"
                   >
                     {item.label}
                   </a>
