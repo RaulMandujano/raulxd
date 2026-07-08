@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { useEffect } from "react";
 import Lenis from "lenis";
+import Snap from "lenis/snap";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -43,7 +44,29 @@ export function SmoothScrollProvider({
     gsap.ticker.add(onTick);
     gsap.ticker.lagSmoothing(0);
 
+    // Gentle scroll-snap: once the hero video finishes and the user scrolls
+    // down, the scroll "settles" onto the About section. Proximity type with a
+    // single snap point (About) keeps the rest of the page free-scrolling.
+    const snap = new Snap(lenis, {
+      type: "proximity",
+      duration: 0.9,
+      easing: (t: number) => 1 - Math.pow(1 - t, 3),
+      distanceThreshold: "40%",
+      debounce: 400,
+    });
+
+    let removeAboutSnap: (() => void) | undefined;
+    const aboutEl = document.querySelector<HTMLElement>("#about");
+    if (aboutEl) {
+      removeAboutSnap = snap.addElement(aboutEl, {
+        align: ["start"],
+        ignoreSticky: true,
+      });
+    }
+
     return () => {
+      removeAboutSnap?.();
+      snap.destroy();
       gsap.ticker.remove(onTick);
       lenis.destroy();
     };
