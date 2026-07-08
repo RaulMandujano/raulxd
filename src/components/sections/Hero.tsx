@@ -1,241 +1,307 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
-import {
-  m,
-  useReducedMotion,
-  useScroll,
-  useSpring,
-  useTransform,
-} from "framer-motion";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import { MagneticButtonLink } from "@/components/ui/MagneticButtonLink";
-import { SystemConsole } from "@/components/ui/SystemConsole";
 import { cn } from "@/lib/utils";
-import { fadeUp, heroMotionProps, staggerContainer } from "@/styles/animations";
 
-const particles = [
-  {
-    className: "left-[8%] top-[18%] h-2.5 w-2.5 bg-sky-300/70",
-    duration: 7,
-    delay: 0.2,
-  },
-  {
-    className: "left-[22%] top-[70%] h-3 w-3 bg-violet-300/55",
-    duration: 9,
-    delay: 0.8,
-  },
-  {
-    className: "right-[16%] top-[22%] h-2 w-2 bg-cyan-200/70",
-    duration: 8.4,
-    delay: 0.4,
-  },
-  {
-    className: "right-[9%] top-[58%] h-3.5 w-3.5 bg-fuchsia-200/45",
-    duration: 10,
-    delay: 1.1,
-  },
-  {
-    className: "left-[48%] top-[14%] h-2 w-2 bg-white/80",
-    duration: 6.8,
-    delay: 0.6,
-  },
-  {
-    className: "left-[68%] top-[78%] h-2.5 w-2.5 bg-sky-100/70",
-    duration: 8.8,
-    delay: 1.4,
-  },
-];
+gsap.registerPlugin(ScrollTrigger);
 
-function ConsolePreview() {
-  return (
-    <m.div
-      variants={fadeUp}
-      className="relative flex w-full justify-center lg:justify-end lg:-mr-10"
-    >
-      <div className="absolute left-[18%] top-[18%] h-28 w-56 rounded-full bg-sky-400/16 blur-3xl" />
-      <div className="absolute right-[14%] top-[18%] h-44 w-44 rounded-full bg-violet-400/12 blur-3xl" />
+const DESKTOP = { dir: "desktop", count: 120 } as const;
+const MOBILE = { dir: "mobile", count: 75 } as const;
+const POSTER = "/hero-poster.webp";
 
-      <div className="w-full max-w-[420px] rounded-[2rem] border border-white/15 bg-white/[0.18] p-3 shadow-[0_36px_100px_-48px_rgba(15,23,42,0.52)] backdrop-blur-xl">
-        <SystemConsole />
-      </div>
-    </m.div>
-  );
+// Fraction of the hero scroll spent scrubbing frames; the remainder holds the
+// final night frame while the text lifts away and the page rises over it.
+const SCRUB_FRACTION = 0.66;
+
+const framePath = (dir: string, i: number) =>
+  `/hero-frames/${dir}/frame_${String(i + 1).padStart(4, "0")}.webp`;
+
+function sceneOpacity(
+  p: number,
+  inStart: number,
+  inEnd: number,
+  outStart: number,
+  outEnd: number,
+) {
+  if (p <= inStart) return inStart === 0 ? 1 : 0;
+  if (p < inEnd) return (p - inStart) / (inEnd - inStart);
+  if (p <= outStart) return 1;
+  if (p < outEnd) return 1 - (p - outStart) / (outEnd - outStart);
+  return 0;
 }
 
 export function Hero() {
-  const shouldReduceMotion = useReducedMotion() ?? false;
   const sectionRef = useRef<HTMLElement | null>(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end end"],
-  });
-  const heroProgress = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 22,
-    mass: 0.28,
-  });
-  const contentY = useTransform(heroProgress, [0, 1], [0, -56]);
-  const contentOpacity = useTransform(heroProgress, [0, 1], [1, 0.8]);
-  const ambientScale = useTransform(heroProgress, [0, 1], [1, 1.08]);
-  const shellPadding = useTransform(heroProgress, [0, 1], ["0px", "24px"]);
-  const shellScale = useTransform(heroProgress, [0, 1], [1, 0.92]);
-  const shellRadius = useTransform(heroProgress, [0, 1], ["0px", "24px"]);
-  const shellShadow = useTransform(
-    heroProgress,
-    [0, 1],
-    [
-      "0 0 0 rgba(15,23,42,0)",
-      "0 24px 60px -20px rgba(15,23,42,0.24), 0 42px 140px -44px rgba(15,23,42,0.24)",
-    ],
-  );
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const scene1Ref = useRef<HTMLDivElement | null>(null);
+  const scene2Ref = useRef<HTMLDivElement | null>(null);
+  const scene3Ref = useRef<HTMLDivElement | null>(null);
+
+  const [ready, setReady] = useState(false);
+  const [staticMode, setStaticMode] = useState(false);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const section = sectionRef.current;
+    if (!canvas || !section) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const connection = (
+      navigator as Navigator & { connection?: { saveData?: boolean } }
+    ).connection;
+    const saveData = Boolean(connection?.saveData);
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    const set = isMobile ? MOBILE : DESKTOP;
+    const isStatic = reduce || saveData;
+    setStaticMode(isStatic);
+
+    const images = new Array<HTMLImageElement | undefined>(set.count);
+    let currentIndex = -1;
+    let disposed = false;
+
+    const drawCover = (img: HTMLImageElement) => {
+      const cw = canvas.width;
+      const ch = canvas.height;
+      if (!cw || !ch) return;
+      const ir = img.naturalWidth / img.naturalHeight;
+      const cr = cw / ch;
+      let dw: number;
+      let dh: number;
+      if (ir > cr) {
+        dh = ch;
+        dw = ch * ir;
+      } else {
+        dw = cw;
+        dh = cw / ir;
+      }
+      ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
+    };
+
+    const isLoaded = (img?: HTMLImageElement): img is HTMLImageElement =>
+      Boolean(img && img.complete && img.naturalWidth > 0);
+
+    const nearestLoaded = (index: number) => {
+      for (let d = 0; d < set.count; d += 1) {
+        if (isLoaded(images[index - d])) return images[index - d];
+        if (isLoaded(images[index + d])) return images[index + d];
+      }
+      return undefined;
+    };
+
+    const renderIndex = (rawIndex: number) => {
+      const index = Math.max(0, Math.min(set.count - 1, rawIndex));
+      if (index === currentIndex) return;
+      const img = isLoaded(images[index]) ? images[index] : nearestLoaded(index);
+      if (img) {
+        drawCover(img);
+        currentIndex = index;
+      }
+    };
+
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(window.innerWidth * dpr);
+      canvas.height = Math.round(window.innerHeight * dpr);
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      const img = images[Math.max(0, currentIndex)];
+      if (isLoaded(img)) drawCover(img);
+    };
+
+    const poster = new Image();
+    poster.onload = () => {
+      if (currentIndex < 0) drawCover(poster);
+    };
+    poster.src = POSTER;
+
+    resize();
+    window.addEventListener("resize", resize);
+
+    const setScene = (el: HTMLDivElement | null, opacity: number) => {
+      if (!el) return;
+      el.style.opacity = String(opacity);
+      el.style.transform = `translate3d(0, ${(1 - opacity) * 18}px, 0)`;
+      el.style.pointerEvents = opacity > 0.6 ? "auto" : "none";
+    };
+
+    // ---- Static path (reduced motion / data saver): final night scene only.
+    if (isStatic) {
+      setScene(scene1Ref.current, 0);
+      setScene(scene2Ref.current, 0);
+      setScene(scene3Ref.current, 1);
+      const last = new Image();
+      last.onload = () => {
+        images[set.count - 1] = last;
+        renderIndex(set.count - 1);
+        if (!disposed) setReady(true);
+      };
+      last.onerror = () => {
+        if (!disposed) setReady(true);
+      };
+      last.src = framePath(set.dir, set.count - 1);
+
+      return () => {
+        disposed = true;
+        window.removeEventListener("resize", resize);
+      };
+    }
+
+    // ---- Scrub path: preload the whole sequence (first frames prioritized).
+    let loadedCount = 0;
+    const bumpLoaded = () => {
+      loadedCount += 1;
+      if (!disposed && loadedCount >= Math.min(set.count, 12)) setReady(true);
+    };
+    for (let i = 0; i < set.count; i += 1) {
+      const img = new Image();
+      img.onload = () => {
+        images[i] = img;
+        if (i === 0) renderIndex(0);
+        bumpLoaded();
+      };
+      img.onerror = bumpLoaded;
+      img.src = framePath(set.dir, i);
+      images[i] = img;
+    }
+
+    setScene(scene1Ref.current, 1);
+    setScene(scene2Ref.current, 0);
+    setScene(scene3Ref.current, 0);
+
+    const trigger = ScrollTrigger.create({
+      trigger: section,
+      start: "top top",
+      end: "bottom bottom",
+      scrub: 0.5,
+      onUpdate: (self) => {
+        // Frames + text play out over the first SCRUB_FRACTION of the hero;
+        // the rest holds the night frame while the sticky text lifts away.
+        const p = Math.min(1, self.progress / SCRUB_FRACTION);
+        renderIndex(Math.round(p * (set.count - 1)));
+        setScene(scene1Ref.current, sceneOpacity(p, 0, 0, 0.18, 0.28));
+        setScene(scene2Ref.current, sceneOpacity(p, 0.4, 0.5, 0.62, 0.72));
+        setScene(scene3Ref.current, sceneOpacity(p, 0.82, 0.9, 2, 2));
+      },
+    });
+
+    const refreshTimeout = window.setTimeout(() => ScrollTrigger.refresh(), 300);
+
+    return () => {
+      disposed = true;
+      window.clearTimeout(refreshTimeout);
+      window.removeEventListener("resize", resize);
+      trigger.kill();
+    };
+  }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      id="hero"
-      className="relative h-[150svh]"
-    >
-      <div className="sticky top-0 h-screen overflow-hidden">
-        <m.div
-          className="mx-auto h-full w-full"
-          style={
-            shouldReduceMotion
-              ? undefined
-              : {
-                  paddingLeft: shellPadding,
-                  paddingRight: shellPadding,
-                  paddingTop: shellPadding,
-                  paddingBottom: shellPadding,
-                  scale: shellScale,
-                }
-          }
-        >
-          <m.div
+    <>
+      {/* Fixed cinematic backdrop — sits behind the nav (full-bleed) and holds
+          the final night frame while the page rises over it. */}
+      <canvas
+        ref={canvasRef}
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-0 h-full w-full bg-slate-950 bg-cover bg-center"
+        style={{ backgroundImage: `url(${POSTER})` }}
+      />
+
+      <section
+        ref={sectionRef}
+        id="hero"
+        className={cn("relative z-[1] w-full", staticMode ? "h-[100svh]" : "h-[300svh]")}
+      >
+        <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
+          {/* Legibility scrims */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(2,6,23,0.32)_0%,transparent_20%,transparent_54%,rgba(2,6,23,0.66)_100%)]"
+          />
+
+          {/* Loading state */}
+          <div
             className={cn(
-              "relative isolate h-full overflow-hidden border border-white/60",
-              "bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(238,242,255,0.84)_34%,rgba(224,231,255,0.68)_58%,rgba(15,23,42,0.12)_100%)]",
+              "pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-slate-950 transition-opacity duration-700",
+              ready ? "opacity-0" : "opacity-100",
             )}
-            style={
-              shouldReduceMotion
-                ? undefined
-                : {
-                    borderRadius: shellRadius,
-                    boxShadow: shellShadow,
-                    transformOrigin: "center center",
-                  }
-            }
           >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.2),transparent_28%),radial-gradient(circle_at_78%_20%,rgba(168,85,247,0.18),transparent_28%),radial-gradient(circle_at_70%_75%,rgba(15,23,42,0.16),transparent_32%),linear-gradient(180deg,rgba(255,255,255,0.08),transparent)]" />
-            <m.div
-              className="absolute -left-20 top-10 h-64 w-64 rounded-full bg-sky-300/28 blur-3xl"
-              style={shouldReduceMotion ? undefined : { scale: ambientScale }}
-            />
-            <m.div
-              className="absolute right-[-4%] top-[20%] h-80 w-80 rounded-full bg-violet-300/18 blur-3xl"
-              style={shouldReduceMotion ? undefined : { scale: ambientScale }}
-            />
-            <m.div
-              className="absolute bottom-[-8%] left-[34%] h-52 w-52 rounded-full bg-white/50 blur-3xl"
-              style={shouldReduceMotion ? undefined : { scale: ambientScale }}
-            />
-            <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.14),transparent_22%,transparent_78%,rgba(15,23,42,0.06))]" />
+            <div className="flex flex-col items-center gap-4">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/25 border-t-white" />
+              <span className="text-xs font-medium uppercase tracking-[0.28em] text-white/60">
+                Loading
+              </span>
+            </div>
+          </div>
 
-            {particles.map((particle) => (
-              <m.span
-                key={particle.className}
-                aria-hidden="true"
-                className={cn(
-                  "absolute rounded-full blur-[1px]",
-                  particle.className,
-                )}
-                animate={
-                  shouldReduceMotion
-                    ? undefined
-                    : {
-                        y: [0, -18, 0],
-                        opacity: [0.35, 0.9, 0.35],
-                        scale: [1, 1.15, 1],
-                      }
-                }
-                transition={
-                  shouldReduceMotion
-                    ? undefined
-                    : {
-                        duration: particle.duration,
-                        delay: particle.delay,
-                        ease: "easeInOut",
-                        repeat: Number.POSITIVE_INFINITY,
-                      }
-                }
-              />
-            ))}
-
-            <m.div
-              variants={staggerContainer}
-              {...heroMotionProps}
-              className="relative flex h-full items-center px-6 py-16 sm:px-10 sm:py-20 lg:px-16 lg:py-24"
-              style={
-                shouldReduceMotion
-                  ? undefined
-                  : {
-                      y: contentY,
-                      opacity: contentOpacity,
-                    }
-              }
+          {/* Scene text overlays — real DOM text (SEO-safe, selectable) */}
+          <div className="absolute inset-0 z-10">
+            {/* Scene 1 — day, close-up */}
+            <div
+              ref={scene1Ref}
+              className="absolute inset-x-0 bottom-[14%] flex flex-col items-center px-6 text-center sm:bottom-[16%]"
             >
-              <div className="mx-auto grid w-full max-w-6xl items-center gap-16 lg:grid-cols-[1fr_1fr] lg:gap-20 xl:gap-24">
-                <div className="max-w-5xl">
-                  <m.div variants={fadeUp}>
-                    <span className="inline-flex items-center rounded-full border border-white/45 bg-white/55 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.26em] text-slate-700 shadow-[0_12px_30px_-20px_rgba(15,23,42,0.45)] backdrop-blur-md">
-                      AI &amp; SaaS Builder
-                    </span>
-                  </m.div>
+              <span className="mb-4 inline-flex items-center rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.26em] text-white/90 backdrop-blur-md">
+                Raul Mandujano
+              </span>
+              <h1 className="max-w-4xl text-5xl font-semibold tracking-[-0.055em] text-white drop-shadow-[0_2px_24px_rgba(2,6,23,0.55)] sm:text-6xl lg:text-7xl">
+                Let&apos;s build something.
+              </h1>
+              <p className="mt-4 flex items-center gap-2 text-sm font-medium uppercase tracking-[0.24em] text-white/70">
+                Scroll to begin
+                <span className="inline-block h-4 w-px animate-pulse bg-white/60" />
+              </p>
+            </div>
 
-                  <m.h1
-                    variants={fadeUp}
-                    className="mt-8 max-w-5xl text-5xl font-semibold tracking-[-0.075em] text-slate-950 sm:text-6xl lg:max-w-3xl lg:text-7xl lg:leading-[0.94]"
-                  >
-                    <span className="block">Building scalable</span>
-                    <span className="animated-gradient-text block pb-1">
-                      SaaS and AI-powered systems
-                    </span>
-                  </m.h1>
+            {/* Scene 2 — golden hour / dusk */}
+            <div
+              ref={scene2Ref}
+              className="absolute inset-0 flex items-center justify-center px-6 opacity-0"
+            >
+              <h2 className="max-w-4xl text-center text-4xl font-semibold leading-[1.05] tracking-[-0.05em] text-white drop-shadow-[0_2px_24px_rgba(2,6,23,0.6)] sm:text-5xl lg:text-[3.75rem]">
+                Building{" "}
+                <span className="bg-gradient-to-r from-sky-300 via-violet-300 to-cyan-200 bg-clip-text text-transparent">
+                  systems
+                </span>
+                , not just code.
+              </h2>
+            </div>
 
-                  <m.p
-                    variants={fadeUp}
-                    className="text-measure mt-7 max-w-3xl text-lg leading-8 text-slate-700 sm:text-xl"
-                  >
-                    I design and develop high-performance platforms that solve real
-                    business problems.
-                  </m.p>
-
-                  <m.div variants={fadeUp} className="mt-10 flex flex-wrap items-center gap-4">
-                    <MagneticButtonLink
-                    href="#contact"
-                    variant="dark"
-                    className={cn(
-                      "!text-white hover:-translate-y-0.5 hover:!text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-950/20",
-                      "hover:shadow-[0_20px_60px_-16px_rgba(59,130,246,0.34),0_18px_50px_-20px_rgba(168,85,247,0.28)]",
-                    )}
-                  >
-                      Let&apos;s Connect
-                      <ArrowUpRight className="h-4 w-4" />
-                    </MagneticButtonLink>
-
-                    <div className="rounded-full border border-white/35 bg-white/35 px-4 py-2 text-sm text-slate-600 backdrop-blur-md">
-                      Scalable systems. Elegant execution.
-                    </div>
-                  </m.div>
-                </div>
-
-                <ConsolePreview />
+            {/* Scene 3 — night, full scene */}
+            <div
+              ref={scene3Ref}
+              className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center opacity-0"
+            >
+              <span className="mb-4 text-xs font-semibold uppercase tracking-[0.3em] text-white/60">
+                Full-Stack Developer · SaaS &amp; AI
+              </span>
+              <p className="text-5xl font-semibold tracking-[-0.055em] text-white drop-shadow-[0_2px_24px_rgba(2,6,23,0.6)] sm:text-6xl lg:text-7xl">
+                Raul Mandujano
+              </p>
+              <p className="mt-5 max-w-xl text-base leading-7 text-white/75 sm:text-lg">
+                Building scalable products from the ground up — architecture, AI,
+                and clean execution.
+              </p>
+              <div className="mt-9">
+                <MagneticButtonLink
+                  href="#contact"
+                  variant="light"
+                  className="hover:-translate-y-0.5"
+                >
+                  Let&apos;s Connect
+                  <ArrowUpRight className="h-4 w-4" />
+                </MagneticButtonLink>
               </div>
-            </m.div>
-          </m.div>
-        </m.div>
-      </div>
-    </section>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

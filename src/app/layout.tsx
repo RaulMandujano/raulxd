@@ -4,7 +4,6 @@ import { Inter } from "next/font/google";
 import { CursorLight } from "@/components/layout/CursorLight";
 import { FloatingResume } from "@/components/layout/FloatingResume";
 import { Navbar } from "@/components/layout/Navbar";
-import { SiteBackground } from "@/components/layout/SiteBackground";
 import { MotionProvider } from "@/components/providers/MotionProvider";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 
@@ -33,7 +32,6 @@ export default function RootLayout({
         <MotionProvider>
           <SmoothScrollProvider>
             <div className="relative isolate min-h-screen">
-              <SiteBackground />
               <CursorLight />
               <div className="relative z-10 flex min-h-screen flex-col">
                 <Navbar />

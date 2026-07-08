@@ -7,7 +7,7 @@ export function SiteBackground() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 overflow-hidden"
+      className="pointer-events-none absolute inset-0 overflow-hidden"
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(96,165,250,0.18),transparent_30%),radial-gradient(circle_at_top_right,rgba(168,85,247,0.16),transparent_28%),radial-gradient(circle_at_70%_78%,rgba(15,23,42,0.18),transparent_34%),linear-gradient(180deg,#f7f9fe_0%,#eef2ff_38%,#eef4ff_68%,#f8fafc_100%)]" />
 
