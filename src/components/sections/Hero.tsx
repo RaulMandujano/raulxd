@@ -18,6 +18,14 @@ const POSTER = "/hero-poster.webp";
 // final night frame while the text lifts away and the page rises over it.
 const SCRUB_FRACTION = 0.66;
 
+// Story beats over the scrub: [fadeInStart, fadeInEnd, fadeOutStart, fadeOutEnd]
+const MID_WINDOWS: [number, number, number, number][] = [
+  [0.16, 0.22, 0.3, 0.36],
+  [0.36, 0.42, 0.48, 0.54],
+  [0.56, 0.62, 0.68, 0.74],
+  [0.76, 0.82, 0.87, 0.92],
+];
+
 const framePath = (dir: string, i: number) =>
   `/hero-frames/${dir}/frame_${String(i + 1).padStart(4, "0")}.webp`;
 
@@ -39,7 +47,7 @@ export function Hero() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const scene1Ref = useRef<HTMLDivElement | null>(null);
-  const scene2Ref = useRef<HTMLDivElement | null>(null);
+  const midRefs = useRef<(HTMLDivElement | null)[]>([]);
   const scene3Ref = useRef<HTMLDivElement | null>(null);
 
   const [ready, setReady] = useState(false);
@@ -135,7 +143,7 @@ export function Hero() {
     // ---- Static path (reduced motion / data saver): final night scene only.
     if (isStatic) {
       setScene(scene1Ref.current, 0);
-      setScene(scene2Ref.current, 0);
+      midRefs.current.forEach((el) => setScene(el, 0));
       setScene(scene3Ref.current, 1);
       const last = new Image();
       last.onload = () => {
@@ -173,7 +181,7 @@ export function Hero() {
     }
 
     setScene(scene1Ref.current, 1);
-    setScene(scene2Ref.current, 0);
+    midRefs.current.forEach((el) => setScene(el, 0));
     setScene(scene3Ref.current, 0);
 
     const trigger = ScrollTrigger.create({
@@ -186,9 +194,11 @@ export function Hero() {
         // the rest holds the night frame while the sticky text lifts away.
         const p = Math.min(1, self.progress / SCRUB_FRACTION);
         renderIndex(Math.round(p * (set.count - 1)));
-        setScene(scene1Ref.current, sceneOpacity(p, 0, 0, 0.18, 0.28));
-        setScene(scene2Ref.current, sceneOpacity(p, 0.4, 0.5, 0.62, 0.72));
-        setScene(scene3Ref.current, sceneOpacity(p, 0.82, 0.9, 2, 2));
+        setScene(scene1Ref.current, sceneOpacity(p, 0, 0, 0.08, 0.15));
+        MID_WINDOWS.forEach((w, i) =>
+          setScene(midRefs.current[i], sceneOpacity(p, w[0], w[1], w[2], w[3])),
+        );
+        setScene(scene3Ref.current, sceneOpacity(p, 0.92, 0.98, 2, 2));
       },
     });
 
@@ -259,24 +269,69 @@ export function Hero() {
               </p>
             </div>
 
-            {/* Scene 2 — golden hour / dusk */}
+            {/* Story beats — short About messages as day turns to night */}
             <div
-              ref={scene2Ref}
-              className="absolute inset-0 flex items-center justify-center px-6 opacity-0"
+              ref={(el) => {
+                midRefs.current[0] = el;
+              }}
+              className="absolute inset-0 flex items-center justify-center px-6 text-center opacity-0 sm:justify-start sm:pl-[9%] sm:text-left"
             >
-              <h2 className="max-w-4xl text-center text-4xl font-semibold leading-[1.05] tracking-[-0.05em] text-white drop-shadow-[0_2px_24px_rgba(2,6,23,0.6)] sm:text-5xl lg:text-[3.75rem]">
-                Building{" "}
+              <p className="max-w-3xl text-4xl font-semibold leading-[1.05] tracking-[-0.05em] text-white drop-shadow-[0_2px_24px_rgba(2,6,23,0.6)] sm:text-5xl lg:text-6xl">
+                Design.{" "}
                 <span className="bg-gradient-to-r from-sky-300 via-violet-300 to-cyan-200 bg-clip-text text-transparent">
-                  systems
+                  Build.
+                </span>{" "}
+                Ship.
+              </p>
+            </div>
+
+            <div
+              ref={(el) => {
+                midRefs.current[1] = el;
+              }}
+              className="absolute inset-0 flex items-center justify-center px-6 text-center opacity-0 sm:justify-end sm:pr-[9%] sm:text-right"
+            >
+              <p className="max-w-xl text-4xl font-semibold leading-[1.12] tracking-[-0.05em] text-white drop-shadow-[0_2px_24px_rgba(2,6,23,0.6)] sm:text-5xl lg:text-6xl">
+                SaaS platforms.{" "}
+                <span className="bg-gradient-to-r from-sky-300 via-violet-300 to-cyan-200 bg-clip-text text-transparent">
+                  AI systems.
+                </span>{" "}
+                Automation.
+              </p>
+            </div>
+
+            <div
+              ref={(el) => {
+                midRefs.current[2] = el;
+              }}
+              className="absolute inset-0 flex items-center justify-center px-6 text-center opacity-0 sm:justify-start sm:pl-[9%] sm:text-left"
+            >
+              <p className="max-w-xl text-4xl font-semibold leading-[1.12] tracking-[-0.05em] text-white drop-shadow-[0_2px_24px_rgba(2,6,23,0.6)] sm:text-5xl lg:text-6xl">
+                From architecture to launch —{" "}
+                <span className="bg-gradient-to-r from-sky-300 via-violet-300 to-cyan-200 bg-clip-text text-transparent">
+                  end to end.
                 </span>
-                , not just code.
-              </h2>
+              </p>
+            </div>
+
+            <div
+              ref={(el) => {
+                midRefs.current[3] = el;
+              }}
+              className="absolute inset-x-0 bottom-[16%] flex flex-col items-center px-6 text-center opacity-0"
+            >
+              <p className="max-w-3xl text-4xl font-semibold leading-[1.05] tracking-[-0.05em] text-white drop-shadow-[0_2px_24px_rgba(2,6,23,0.6)] sm:text-5xl lg:text-6xl">
+                Need it built?{" "}
+                <span className="bg-gradient-to-r from-sky-300 via-violet-300 to-cyan-200 bg-clip-text text-transparent">
+                  Hire an expert.
+                </span>
+              </p>
             </div>
 
             {/* Scene 3 — night, full scene */}
             <div
               ref={scene3Ref}
-              className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center opacity-0"
+              className="absolute inset-x-0 bottom-[5%] flex flex-col items-center px-6 text-center opacity-0 sm:bottom-[6%]"
             >
               <span className="mb-4 text-xs font-semibold uppercase tracking-[0.3em] text-white/60">
                 Full-Stack Developer · SaaS &amp; AI
