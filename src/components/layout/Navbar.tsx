@@ -57,16 +57,24 @@ export function Navbar() {
     <header className="sticky top-0 z-40 px-3 pt-3 sm:px-4">
       <div
         className={cn(
-          "site-container flex h-16 items-center justify-between gap-6 rounded-full border px-4 transition-all duration-300 sm:px-6",
+          "site-container flex h-16 items-center justify-between gap-6 transition-all duration-300",
+          // The pill container only exists on desktop (where the nav lives);
+          // on mobile the logo + menu button float on their own backgrounds.
+          "md:rounded-full md:border md:px-6",
           isScrolled || isMenuOpen
-            ? "border-slate-200/80 bg-white/82 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.35)] backdrop-blur-xl"
-            : "border-transparent bg-transparent shadow-none",
+            ? "md:border-slate-200/80 md:bg-white/82 md:shadow-[0_18px_50px_-30px_rgba(15,23,42,0.35)] md:backdrop-blur-xl"
+            : "md:border-transparent md:bg-transparent md:shadow-none",
         )}
       >
         <a
           href="#hero"
           aria-label="Raul — back to top"
-          className="group flex items-center gap-2.5"
+          className={cn(
+            "group flex items-center gap-2.5",
+            // Own chip background on mobile; blends into the pill on desktop.
+            "rounded-full border border-slate-200/80 bg-white/85 py-1.5 pl-1.5 pr-4 shadow-[0_10px_30px_-16px_rgba(15,23,42,0.5)] backdrop-blur-xl",
+            "md:border-transparent md:bg-transparent md:p-0 md:shadow-none md:backdrop-blur-none",
+          )}
           onClick={() => setIsMenuOpen(false)}
         >
           <span className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-white/60 bg-white/70 shadow-[0_8px_22px_-12px_rgba(15,23,42,0.45)] ring-1 ring-slate-900/5 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105">
@@ -113,10 +121,7 @@ export function Navbar() {
           aria-controls="mobile-menu"
           onClick={() => setIsMenuOpen((open) => !open)}
           className={cn(
-            "flex h-10 w-10 flex-col items-center justify-center gap-[5px] rounded-full border transition-colors duration-300 md:hidden",
-            isScrolled || isMenuOpen
-              ? "border-slate-200/80 bg-white/70"
-              : "border-white/40 bg-white/40",
+            "flex h-11 w-11 flex-col items-center justify-center gap-[5px] rounded-full border border-slate-200/80 bg-white/85 shadow-[0_10px_30px_-16px_rgba(15,23,42,0.5)] backdrop-blur-xl transition-colors duration-300 md:hidden",
           )}
         >
           <span

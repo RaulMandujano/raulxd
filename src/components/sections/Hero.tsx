@@ -13,6 +13,9 @@ gsap.registerPlugin(ScrollTrigger);
 const DESKTOP = { dir: "desktop", count: 120 } as const;
 const MOBILE = { dir: "mobile", count: 75 } as const;
 const POSTER = "/hero-poster.webp";
+// Full-resolution (1920px) last frame — drawn once the night is held so the
+// static backdrop that stays behind the page stays crisp on every screen.
+const FINAL = "/hero-final.webp";
 
 // Fraction of the hero scroll spent scrubbing frames; the remainder holds the
 // final night frame while the text lifts away and the page rises over it.
@@ -114,12 +117,32 @@ export function Hero() {
       }
     };
 
+    // Full-resolution last frame for the held-night backdrop.
+    const finalImg = new Image();
+    let finalReady = false;
+    let wantFinal = false;
+    const drawFinal = () => {
+      if (!finalReady) return;
+      drawCover(finalImg);
+      currentIndex = -1;
+    };
+    finalImg.onload = () => {
+      finalReady = true;
+      if (wantFinal || isStatic) drawFinal();
+      if (isStatic && !disposed) setReady(true);
+    };
+    finalImg.src = FINAL;
+
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(window.innerWidth * dpr);
       canvas.height = Math.round(window.innerHeight * dpr);
       canvas.style.width = `${window.innerWidth}px`;
       canvas.style.height = `${window.innerHeight}px`;
+      if (wantFinal && finalReady) {
+        drawCover(finalImg);
+        return;
+      }
       const img = images[Math.max(0, currentIndex)];
       if (isLoaded(img)) drawCover(img);
     };
@@ -145,16 +168,24 @@ export function Hero() {
       setScene(scene1Ref.current, 0);
       midRefs.current.forEach((el) => setScene(el, 0));
       setScene(scene3Ref.current, 1);
-      const last = new Image();
-      last.onload = () => {
-        images[set.count - 1] = last;
-        renderIndex(set.count - 1);
+      wantFinal = true;
+      if (finalReady) {
+        drawFinal();
+        if (!disposed) setReady(true);
+      }
+      // Fallback to the last sequence frame if the hi-res final is slow/fails.
+      const fallback = new Image();
+      fallback.onload = () => {
+        if (!finalReady) {
+          images[set.count - 1] = fallback;
+          renderIndex(set.count - 1);
+        }
         if (!disposed) setReady(true);
       };
-      last.onerror = () => {
+      fallback.onerror = () => {
         if (!disposed) setReady(true);
       };
-      last.src = framePath(set.dir, set.count - 1);
+      fallback.src = framePath(set.dir, set.count - 1);
 
       return () => {
         disposed = true;
@@ -193,7 +224,18 @@ export function Hero() {
         // Frames + text play out over the first SCRUB_FRACTION of the hero;
         // the rest holds the night frame while the sticky text lifts away.
         const p = Math.min(1, self.progress / SCRUB_FRACTION);
-        renderIndex(Math.round(p * (set.count - 1)));
+        if (p >= 0.995) {
+          if (!wantFinal) {
+            wantFinal = true;
+            drawFinal();
+          }
+        } else {
+          if (wantFinal) {
+            wantFinal = false;
+            currentIndex = -1;
+          }
+          renderIndex(Math.round(p * (set.count - 1)));
+        }
         setScene(scene1Ref.current, sceneOpacity(p, 0, 0, 0.08, 0.15));
         MID_WINDOWS.forEach((w, i) =>
           setScene(midRefs.current[i], sceneOpacity(p, w[0], w[1], w[2], w[3])),
