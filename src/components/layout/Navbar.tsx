@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, m } from "framer-motion";
 
@@ -16,26 +16,7 @@ const navItems = [
 ];
 
 export function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const updateScrollState = useEffectEvent(() => {
-    setIsScrolled(window.scrollY > 24);
-  });
-
-  useEffect(() => {
-    updateScrollState();
-
-    const onScroll = () => {
-      updateScrollState();
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-    };
-  }, []);
 
   // Close the mobile menu if the viewport grows to desktop size.
   useEffect(() => {
@@ -57,13 +38,11 @@ export function Navbar() {
     <header className="sticky top-0 z-40 px-3 pt-3 sm:px-4">
       <div
         className={cn(
-          "site-container flex h-16 items-center justify-between gap-6 transition-all duration-300",
-          // The pill container only exists on desktop (where the nav lives);
-          // on mobile the logo + menu button float on their own backgrounds.
-          "md:rounded-full md:border md:px-6",
-          isScrolled || isMenuOpen
-            ? "md:border-slate-200/80 md:bg-white/82 md:shadow-[0_18px_50px_-30px_rgba(15,23,42,0.35)] md:backdrop-blur-xl"
-            : "md:border-transparent md:bg-transparent md:shadow-none",
+          "site-container flex h-16 items-center justify-between gap-6",
+          // The pill only exists on desktop (mobile floats its own chips). It's
+          // always visible now, but translucent frosted glass so the backdrop
+          // shows through instead of disappearing at the top of the page.
+          "md:rounded-full md:border md:border-white/30 md:bg-white/15 md:px-6 md:shadow-[0_18px_50px_-30px_rgba(15,23,42,0.28)] md:backdrop-blur-sm",
         )}
       >
         <a

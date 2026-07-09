@@ -6,6 +6,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import { MagneticButtonLink } from "@/components/ui/MagneticButtonLink";
+import { MID_WINDOWS, SCRUB_FRACTION } from "@/lib/heroTimeline";
 import { cn } from "@/lib/utils";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -16,18 +17,6 @@ const POSTER = "/hero-poster.webp";
 // Full-resolution (1920px) last frame — drawn once the night is held so the
 // static backdrop that stays behind the page stays crisp on every screen.
 const FINAL = "/hero-final.webp";
-
-// Fraction of the hero scroll spent scrubbing frames; the remainder holds the
-// final night frame while the text lifts away and the page rises over it.
-const SCRUB_FRACTION = 0.66;
-
-// Story beats over the scrub: [fadeInStart, fadeInEnd, fadeOutStart, fadeOutEnd]
-const MID_WINDOWS: [number, number, number, number][] = [
-  [0.16, 0.22, 0.3, 0.36],
-  [0.36, 0.42, 0.48, 0.54],
-  [0.56, 0.62, 0.68, 0.74],
-  [0.76, 0.82, 0.87, 0.92],
-];
 
 const framePath = (dir: string, i: number) =>
   `/hero-frames/${dir}/frame_${String(i + 1).padStart(4, "0")}.webp`;

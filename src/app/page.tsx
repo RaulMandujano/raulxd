@@ -16,15 +16,10 @@ export default function HomePage() {
           while the copy settles into place around the seated figure. */}
       <About />
 
-      {/* Content deck — rises over the fixed cinematic backdrop. The sticky
-          veil is translucent frosted glass, so the final night frame stays as
-          the page background while all content scrolls over it. */}
+      {/* Content deck — sits directly over the fixed night backdrop. Each
+          section carries its own frosted panel, so the video stays visible
+          between them instead of being covered by a full-screen veil. */}
       <div className="relative z-[2]">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none sticky top-0 -mb-[100svh] h-[100svh] border-t border-white/20 bg-[linear-gradient(180deg,rgba(247,249,254,0.34)_0%,rgba(240,244,255,0.26)_34%,rgba(240,245,255,0.22)_100%)] shadow-[0_-40px_90px_-30px_rgba(2,6,23,0.55)] backdrop-blur-[8px]"
-        />
-
         <Services />
         <Projects />
         <GithubActivity />

@@ -7,6 +7,8 @@ import Snap from "lenis/snap";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+import { SCENE_SNAP_PROGRESS, SCRUB_FRACTION } from "@/lib/heroTimeline";
+
 gsap.registerPlugin(ScrollTrigger);
 
 type SmoothScrollProviderProps = {
@@ -64,7 +66,28 @@ export function SmoothScrollProvider({
       });
     }
 
+    // Snap to each hero message so scrolling settles exactly on the frame where
+    // the message reads — a deliberate, slide-by-slide feel through the video.
+    const heroEl = document.querySelector<HTMLElement>("#hero");
+    let sceneRemovers: Array<() => void> = [];
+    const addSceneSnaps = () => {
+      sceneRemovers.forEach((remove) => remove());
+      sceneRemovers = [];
+      if (!heroEl) return;
+      const heroTop = heroEl.getBoundingClientRect().top + window.scrollY;
+      const scrubRange = heroEl.offsetHeight - window.innerHeight;
+      const range = SCRUB_FRACTION * scrubRange; // scrollY where the night is held
+      sceneRemovers = SCENE_SNAP_PROGRESS.map((p) =>
+        snap.add(Math.round(heroTop + p * range)),
+      );
+    };
+    addSceneSnaps();
+    const onResize = () => addSceneSnaps();
+    window.addEventListener("resize", onResize);
+
     return () => {
+      window.removeEventListener("resize", onResize);
+      sceneRemovers.forEach((remove) => remove());
       removeAboutSnap?.();
       snap.destroy();
       gsap.ticker.remove(onTick);
